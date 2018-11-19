@@ -70,7 +70,9 @@ public class MachineController  extends Thread implements IMachineController {
 				else
 					drinks.reset();
 		
+		 
 		 drinks.checkDrink();
+		 
 			 
 
 //		Cup cup = machine.getCup();
@@ -85,9 +87,10 @@ public class MachineController  extends Thread implements IMachineController {
 		
 //		int keyCode = machine.getKeyPad().getNextKeyCode();
 		String coinCode = machine.getCoinHandler().getCoinKeyCode();
-		if (coinCode != null && machine.getWaterHeater().getTemperatureDegreesC() < WHC.getEFFICIENT_TEMP()) 
+		if (coinCode != null && machine.getWaterHeater().getTemperatureDegreesC() < WHC.getEFFICIENT_TEMP()) {
 			coins.coin(coinCode); // Converts coinCode to money
 			machine.getDisplay().setTextString("Balance: " + coins.convertToMoneyDisplay());
+		}
 		
 //		switch (keyCode) {
 //			case 0 :

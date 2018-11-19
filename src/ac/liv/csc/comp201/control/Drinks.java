@@ -2,9 +2,6 @@ package ac.liv.csc.comp201.control;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-
-import com.sun.org.apache.xalan.internal.xsltc.dom.MatchingIterator;
-
 import ac.liv.csc.comp201.model.IMachine;
 import ac.liv.csc.comp201.simulate.Cup;
 import ac.liv.csc.comp201.simulate.Hoppers;
@@ -18,7 +15,8 @@ public class Drinks extends Drink {
 	private static boolean orderSuccessful, maxTempReached = false;
 
 	private static String orderCodeString = ""; // Stores complete order code 
-	private static int orderCode, keyCode, match, ingredientsIndex = 0; 
+	private static int orderCode, keyCode, ingredientsIndex = 0; 
+	private static int match = -1;
 	// Order code stores the orderCode in Int format
 	// KeyCode stores the selected keyCode value
 	// Match stores the array pos of the drink they selected
@@ -112,7 +110,7 @@ public class Drinks extends Drink {
 			if (keyCode == RETURN_CHANGE_BUTTON) {// If reject button, return balance
 				CoinValidation.getChange();
 				reset();
-				machine.getDisplay().setTextString("Balance: " + machine.getBalance() + " Order code: " + orderCodeString);
+				machine.getDisplay().setTextString("Balance: " + machine.getBalance());
 				return false;
 			}
 			// If temp hasn't reached idle yet then the user cannot start entering ordercode until at IDLE temp
@@ -132,6 +130,8 @@ public class Drinks extends Drink {
 	public boolean orderCode() { // Returns the correct order code
 		
 		Drinks.init(); // Initialise all drinks
+		machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Order code: " + orderCodeString);
+
 
 		if (orderCodeString.length() < MAX_CODE_LEN)  { // Only store up maximum code length (4)
 			orderCodeString += Integer.toString(keyCode); // Converts integer code into string
@@ -148,21 +148,21 @@ public class Drinks extends Drink {
 		}
 		
 		if (orderCodeString.length() == codeLen && orderCodeString.length() <= MAX_CODE_LEN) { // We have got a key code of target length
-			System.out.println("FINAL Code is: " + orderCodeString + " Length: " + codeLen + "\n\n");
+			System.out.println("FINAL Code is: " + orderCodeString + " Length: " + codeLen);
 			orderCode = Integer.parseInt(orderCodeString); // String to Integer // Stores final orderCode
-		}
-		
-		for (int i = 0; i < allDrinks.size(); i++) { // Check order code
-			if (orderCode == allDrinks.get(i).code) { // If correct orderCode
-				match = i;
-				System.out.println("IJOIWJRE");
-				return true;		
+				
+			for (int i = 0; i < allDrinks.size(); i++) { // Check order code
+				if (orderCode == allDrinks.get(i).code) { // If correct orderCode
+					match = i;
+					return true;		
+				}
 			}
-			if (orderCodeString.length() == codeLen && orderCodeString.length() <= MAX_CODE_LEN && orderCode != allDrinks.get(i).code) { // If correct orderCode
-				System.out.println("Incorrect order code, try again");
-				machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Incorrect order code, try again");
+		
+			 if (match == -1) {
+				System.out.println("Balance: " + CoinValidation.convertToMoneyDisplay() + " Incorrect order code, try again");
+				machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Incorrect order code, try again");	
 				reset();
-				return false;		
+				return false;	
 			}
 		}
 		
@@ -172,7 +172,7 @@ public class Drinks extends Drink {
 	
 	public boolean startDrink() { // Validate the code and check if it matches the list of other drinks
 				
-				 // Checks price 
+		// Checks price 
 		if  (machine.getBalance() < allDrinks.get(match).price) {
 			System.out.println("Not enough money, Entered: " + CoinValidation.convertToMoneyDisplay() + " Need: " + allDrinks.get(match).price);
 			machine.getDisplay().setTextString("Not enough money, Entered: " + CoinValidation.convertToMoneyDisplay() + " Need: " + allDrinks.get(match).price);
@@ -216,7 +216,7 @@ public class Drinks extends Drink {
 			
 			if (machine.getBalance() >= allDrinks.get(match).price) {
 				machine.setBalance((int) (machine.getBalance() - allDrinks.get(match).price)); // updates price
-				System.out.println("Making drink: " + allDrinks.get(match).name + "\nOrder is: " + allDrinks.get(match).code + "\nPrice is: £" + allDrinks.get(match).price);
+				System.out.println("Making drink: " + allDrinks.get(match).name + "\nOrder is: " + allDrinks.get(match).code + "\nPrice is: ï¿½" + allDrinks.get(match).price);
 				machine.getDisplay().setTextString("Change is: " + CoinValidation.convertToMoneyDisplay() + " Order code: " + orderCode + " Drink: " + allDrinks.get(match).name);
 				orderSuccessful = true;
 				return true;
@@ -236,16 +236,18 @@ public class Drinks extends Drink {
 	
 	public void checkDrink() {
 
-			if (machine.getWaterHeater().getTemperatureDegreesC() >= EFFICIENT_TEMP) {
-				machine.getDisplay().setTextString("total is: " +  CoinValidation.convertToMoneyDisplay() + " Order code: " + orderCodeString);
-			}
+		if (!maxTempReached && machine.getWaterHeater().getTemperatureDegreesC() > EFFICIENT_TEMP) { // displays at the start of making the drink
+			machine.getDisplay().setTextString("total is: " +  CoinValidation.convertToMoneyDisplay() + " Order code: " + orderCodeString);
+		}
 		
 
 		Cup cup = machine.getCup();
 		if (cup != null) {  // Control drink making here and get levels of ingredients
 			
 			machine.getDisplay().setTextString("Balance: " + machine.getBalance() + " Order code: " + orderCodeString + " Drink: " + allDrinks.get(match).name);
-			 
+			if (cup.getWaterLevelLitres() >= cupSizeWaterLevel())
+				machine.getDisplay().setTextString("Balance: " + machine.getBalance() + " - " +  allDrinks.get(match).name + " ready");
+
 			 // If coffee was selected and temperature has reached correct temp
 			 if (!dispense[3] && maxTempReached == false && machine.getWaterHeater().getTemperatureDegreesC() >= MAX_COFFEE_TEMP) {
 				System.out.println("Correct coffee temp reached! Cooling down!");
@@ -257,41 +259,39 @@ public class Drinks extends Drink {
 			if (maxTempReached && cup.getWaterLevelLitres() >= cupSizeWaterLevel()) { 
 				machine.getWaterHeater().setHotWaterTap(false); 
 				System.out.println("Water amount is correct: " + cup.getWaterLevelLitres());
-				machine.getDisplay().setTextString(allDrinks.get(match).name + " ready, Balance: " + CoinValidation.convertToMoneyDisplay());
 				reset();
 			}
 			
-			else if (maxTempReached) {
+			else if (maxTempReached) 
 				machine.getWaterHeater().setHotWaterTap(true); 
-				System.out.println("Water: " + cup.getWaterLevelLitres());
-			}
+			
 			
 			if (maxTempReached && cup.getCoffeeGrams() >= amountLimit[0]) {
 				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
 				System.out.println("Coffee amount is correct: " + cup.getCoffeeGrams());
+				dispense[0] = false;
 			}
-			else if (maxTempReached && dispense[0]) {
+			else if (maxTempReached && dispense[0]) 
 				machine.getHoppers().setHopperOn(Hoppers.COFFEE);
-				System.out.println("Coffee: " + cup.getCoffeeGrams());
-			}
 			
-			if (maxTempReached && cup.getSugarGrams() >=  amountLimit[1]) {
+			
+			if (maxTempReached && cup.getSugarGrams() >= amountLimit[1]) {
 				machine.getHoppers().setHopperOff(Hoppers.SUGAR);
 				System.out.println("Sugar amount is correct: " + cup.getSugarGrams());
+				dispense[1] = false;
 			}
-			else if (maxTempReached && dispense[1]) {
+			else if (maxTempReached && dispense[1]) 
 				machine.getHoppers().setHopperOn(Hoppers.SUGAR);
-				System.out.println("Coffee: " + cup.getSugarGrams());
-			}
 			
-			if (maxTempReached  && cup.getMilkGrams() >=  amountLimit[2]) {
+			
+			if (maxTempReached && cup.getMilkGrams() >=  amountLimit[2]) {
 				machine.getHoppers().setHopperOff(Hoppers.MILK);
 				System.out.println("Milk Powder amount is correct: " + cup.getMilkGrams());
+				dispense[2] = false;
 			}
-			else if (maxTempReached && dispense[2]) {
+			else if (maxTempReached && dispense[2]) 
 				machine.getHoppers().setHopperOn(Hoppers.MILK); 
-				System.out.println("Milk Powder: " + cup.getMilkGrams());
-		}
+		
 		 
 			if (dispense[3] && !maxTempReached && machine.getWaterHeater().getTemperatureDegreesC() >= MAX_HOT_CHOCOLATE_TEMP) {
 				System.out.println("Correct hot chocolate temp reached! Cooling down!");
@@ -301,17 +301,15 @@ public class Drinks extends Drink {
 			else if (maxTempReached)
 				machine.getWaterHeater().setHotWaterTap(true); 
 
-			if ( maxTempReached && amountLimit[3] != 0 && cup.getChocolateGrams() >= amountLimit[3]) {
+			if (maxTempReached && amountLimit[3] != 0 && cup.getChocolateGrams() >= amountLimit[3]) {
 				machine.getHoppers().setHopperOff(Hoppers.CHOCOLATE);
 				System.out.println("Chocolate amount is correct: " + cup.getChocolateGrams());
 				machine.getDisplay().setTextString(allDrinks.get(match).name + " ready, Balance: " + CoinValidation.convertToMoneyDisplay());
 				reset();
 			}
-			else if (maxTempReached && dispense[3]) {
+			else if (maxTempReached && dispense[3]) 
 				machine.getHoppers().setHopperOn(Hoppers.CHOCOLATE);
-				System.out.println("Chocolate: " + cup.getChocolateGrams());
-
-			}
+			
 		}
 		
 	}
@@ -322,6 +320,7 @@ public class Drinks extends Drink {
 		IDLE = true;
 		orderCodeString = "";
 		orderCode = 0;
+		maxTempReached = false;
 		Arrays.fill(dispense, false);
 	}
 
