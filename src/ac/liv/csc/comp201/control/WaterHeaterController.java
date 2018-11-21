@@ -42,7 +42,11 @@ public class WaterHeaterController {
 		float difference = newTemp - oldTemp;
 
 		// If heater is off and the temp is going up
+<<<<<<< HEAD
+		if (machine.getWaterHeater().getHeaterOnStatus() == false && newTemp > oldTemp) {
+=======
 		if (machine.getWaterHeater().getHeaterOnStatus() == false && difference > 3) {
+>>>>>>> fd9df268f9651a98b0373c5d9cf8f541cc5574a4
 			System.out.println("prev: " + oldTemp + " new: " + newTemp);
 			System.out.println("Shutting machine down! Temp is going up but machine heater is off!");
 			machine.shutMachineDown();

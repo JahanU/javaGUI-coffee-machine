@@ -49,11 +49,11 @@ public class Drink {
 	protected static void init() {
 		// SMALL CUP SIZE
 		// Name / Code / Price / Temp
-		allDrinks.add(new Drink("Black coffee", 101, 120, 95.90));
-		allDrinks.add(new Drink("Black coffee With sugar", 102, 130, 95.90));
-		allDrinks.add(new Drink("White coffee", 201, 120, 95.90));
-		allDrinks.add(new Drink("White coffee With sugar", 202, 130, 95.90));
-		allDrinks.add(new Drink("Hot chocolate", 300, 110, 95.90));
+		allDrinks.add(new Drink("Small - Black coffee", 101, 120, 95.90));
+		allDrinks.add(new Drink("Small - Black coffee With sugar", 102, 130, 95.90));
+		allDrinks.add(new Drink("Small - White coffee", 201, 120, 95.90));
+		allDrinks.add(new Drink("Small - White coffee With sugar", 202, 130, 95.90));
+		allDrinks.add(new Drink("Small - Hot chocolate", 300, 110, 95.90));
 		
 		// MEDIUM CUP SIZE
 		allDrinks.add(new Drink("Medium - Black coffee", 5101, 140, 95.90));

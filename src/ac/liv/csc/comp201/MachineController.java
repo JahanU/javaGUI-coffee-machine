@@ -66,7 +66,7 @@ public class MachineController  extends Thread implements IMachineController {
 		 if (drinks.keyCodePressed(keyCode)) 
 			 if (drinks.orderCode())  // Create order code
 				if (drinks.startDrink())  // checks code to get drink
-					System.out.println("!! starting drink !!");	
+					System.out.println("Starting drink");	
 				else
 					drinks.reset();
 		
