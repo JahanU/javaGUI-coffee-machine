@@ -9,8 +9,6 @@ import ac.liv.csc.comp201.simulate.CoinHandler;
 public class CoinValidation extends MachineController {
 	
 	private static IMachine machine;
-	private static int totalCoins = 0;
-	private static String stringTotalCoins, coinCode;
 	
 	static int coinChange[] = new int[6];
 	static int amount[] = new int[6];
@@ -21,18 +19,16 @@ public class CoinValidation extends MachineController {
 	}
 	
 	
-	public static int coin(String coinCode) { // returns value based on coinCode
+	public static void coin(String coinCode) { // returns value based on coinCode
 		
 		String coinCodes[]={"ab","ac","ba","bc","bd","ef"};
 		int coinValue[]={1, 5, 10, 20, 50, 100};
 		
-		for (int i = 0; i < coinValue.length; i++ ) {
-			if (coinCode == coinCodes[i]) {
+		for (int i = 0; i < coinValue.length; i++ ) 
+			if (coinCode == coinCodes[i]) 
 				machine.setBalance(machine.getBalance() + coinValue[i]);
-				return coinValue[i];
-			}
-		}
-		return 0;
+			
+		
 	}
 	
 	
@@ -45,7 +41,8 @@ public class CoinValidation extends MachineController {
 	     if (penceAmount < 10) 
 	    	 returnString = returnString + "0"; // leading zero to allow 2dp display 
 
-	    return(returnString + penceAmount); 
+	    
+	    return (returnString + penceAmount); 
 	} 
 
 
@@ -61,12 +58,13 @@ public class CoinValidation extends MachineController {
 		for (int i = 0; i < coins.length; i++) {
 			if (coins[i] <= machine.getBalance() && machine.getCoinHandler().coinAvailable(coinCodes[i])) { // Check If coins is less than that total and if coin is available in machine
 				
-				machine.getCoinHandler().dispenseCoin(coinCodes[i]); // dispense the coincode from machine
 	
 				int num = machine.getBalance()/coins[i];
 				amount[i] = num; // Stores amount of coins that can be returned 
 				coinChange[i] = coins[i]; // Stores the value of the change
 				
+				machine.getCoinHandler().dispenseCoin(coinCodes[i]); // dispense the coincode from machine
+
 				machine.setBalance(machine.getBalance() - (num * coins[i])); // Updates balance 
 			}
 		}

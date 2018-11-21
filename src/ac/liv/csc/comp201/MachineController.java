@@ -87,9 +87,10 @@ public class MachineController  extends Thread implements IMachineController {
 		
 //		int keyCode = machine.getKeyPad().getNextKeyCode();
 		String coinCode = machine.getCoinHandler().getCoinKeyCode();
-		if (coinCode != null && machine.getWaterHeater().getTemperatureDegreesC() < WHC.getEFFICIENT_TEMP()) {
+		if (coinCode != null) {
 			coins.coin(coinCode); // Converts coinCode to money
-			machine.getDisplay().setTextString("Balance: " + coins.convertToMoneyDisplay());
+			machine.getDisplay().setTextString("Balance: " +  CoinValidation.convertToMoneyDisplay() + " Order code: " + Drinks.orderCodeString);
+
 		}
 		
 //		switch (keyCode) {

@@ -25,7 +25,7 @@ public class WaterHeaterController {
  *	If the water reaches boiling point the machine should be shutdown. 
  */
 	public void boilingPoint() {
-		if (machine.getWaterHeater().getTemperatureDegreesC() == 100) {
+		if (machine.getWaterHeater().getTemperatureDegreesC() >= 100) {
 			System.out.println("Shutting machine down! boilling point reached");
 			machine.shutMachineDown();
 		}
@@ -38,23 +38,24 @@ public class WaterHeaterController {
 //	you need to shutdown the machine and display an error message.
 	public void machineError() {
 		
-		float midTemp = machine.getWaterHeater().getTemperatureDegreesC();
+		float newTemp = machine.getWaterHeater().getTemperatureDegreesC();
+		float difference = newTemp - oldTemp;
 
 		// If heater is off and the temp is going up
-		if (machine.getWaterHeater().getHeaterOnStatus() == false && oldTemp < midTemp) {
-			System.out.println("low: " + oldTemp + " mid: " + midTemp);
+		if (machine.getWaterHeater().getHeaterOnStatus() == false && difference > 3) {
+			System.out.println("prev: " + oldTemp + " new: " + newTemp);
 			System.out.println("Shutting machine down! Temp is going up but machine heater is off!");
 			machine.shutMachineDown();
 		}
-		oldTemp = midTemp;
+		oldTemp = newTemp;
 	}
 	
 
 	public boolean saveElectricity() { // maintain heat around 75 C
 		
-		if (machine.getWaterHeater().getTemperatureDegreesC() >= getEFFICIENT_TEMP() && drink.getIdle())  // if above 75, turn heater off
+		if (machine.getWaterHeater().getTemperatureDegreesC() > getEFFICIENT_TEMP() && drink.getIdle())  // if above 76, turn heater off
 			machine.getWaterHeater().setHeaterOff();
-		 if (machine.getWaterHeater().getTemperatureDegreesC() < getEFFICIENT_TEMP() && drink.getIdle()) // if below 75, turn heater on
+		 if (machine.getWaterHeater().getTemperatureDegreesC() < getEFFICIENT_TEMP() && drink.getIdle()) // if below 76, turn heater on
 			machine.getWaterHeater().setHeaterOn(); // set the heater on, until it reaches 75 C
 		
 	return false;
