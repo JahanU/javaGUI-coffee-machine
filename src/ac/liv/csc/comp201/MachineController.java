@@ -1,5 +1,4 @@
 package ac.liv.csc.comp201;
-
 import ac.liv.csc.comp201.control.CoinValidation;
 import ac.liv.csc.comp201.control.Drink;
 import ac.liv.csc.comp201.control.Drinks;
@@ -8,8 +7,6 @@ import ac.liv.csc.comp201.model.IMachine;
 import ac.liv.csc.comp201.model.IMachineController;
 import ac.liv.csc.comp201.simulate.Cup;
 import ac.liv.csc.comp201.simulate.Hoppers;
-
-
 
 public class MachineController  extends Thread implements IMachineController {
 	
@@ -25,13 +22,6 @@ public class MachineController  extends Thread implements IMachineController {
 	
 	public void startController(IMachine machine) {
 		this.machine=machine; // Machine that is being controlled
-//		machine.getKeyPad().setCaption(0,"Cup");
-//		machine.getKeyPad().setCaption(1,"Water heater on");
-//		machine.getKeyPad().setCaption(2,"Water heater off");		
-//		machine.getKeyPad().setCaption(3,"Hot Water On");
-//		machine.getKeyPad().setCaption(4,"Hot Water Off");		
-//		machine.getKeyPad().setCaption(5,"Dispense coffee");
-//		machine.getKeyPad().setCaption(6,"Dispense milk");
 		machine.getKeyPad().setCaption(7,"");
 		machine.getKeyPad().setCaption(8,"");
 		machine.getKeyPad().setCaption(9,"Reject");	
@@ -46,94 +36,35 @@ public class MachineController  extends Thread implements IMachineController {
 	
 	
 	public MachineController() {
-		
 	}
-	
 	
 	private synchronized void runStateMachine() {
 
-		WHC.boilingPoint(); // If temp reaches 100C turn machien off
+		WHC.boilingPoint(); // If temp reaches 100C turn machine off
 		WHC.machineError(); // Checks if there is an issue with the machine i.e. temp going up but heater is off
+								
+		if (drinks.getIdle()) // If IDLE is true, than go to save electricity mode
+			WHC.saveElectricity();	
 		
-						
 		int keyCode = machine.getKeyPad().getNextKeyCode();
-	
-		
-		if (drinks.getIdle()) 
-			WHC.saveElectricity();
-		
-		
-		 if (drinks.keyCodePressed(keyCode)) 
+		 if (drinks.keyCodePressed(keyCode)) // Pass and validates keyCode when pressed
 			 if (drinks.orderCode())  // Create order code
 				if (drinks.startDrink())  // checks code to get drink
 					System.out.println("Starting drink");	
 				else
-					drinks.reset();
+					drinks.reset(); // Code is false, not enough money, or ingredients
 		
 		 
-		 drinks.checkDrink();
-		 
-			 
+		 drinks.checkDrink(); // Checks drink state, such as temp, if ingredients reached etc
 
-//		Cup cup = machine.getCup();
-//		if (cup != null) {
-//			System.out.println("Water level is " + cup.getWaterLevelLitres() + " coffee is " + cup.getCoffeeGrams() + "grams");
-//			if (cup.getCoffeeGrams() >= 2) {
-//				machine.getHoppers().setHopperOff(Hoppers.COFFEE);
-//				System.out.println("Coffee is at: " + cup.getCoffeeGrams() + "\nWater level is at: " + +cup.getWaterLevelLitres());
-//			}
-//		}
-		
-		
-//		int keyCode = machine.getKeyPad().getNextKeyCode();
 		String coinCode = machine.getCoinHandler().getCoinKeyCode();
 		if (coinCode != null) {
 			coins.coin(coinCode); // Converts coinCode to money
 			machine.getDisplay().setTextString("Balance: " +  CoinValidation.convertToMoneyDisplay() + " Order code: " + Drinks.orderCodeString);
-
 		}
-		
-//		switch (keyCode) {
-//			case 0 :
-//				System.out.println("Vending cup"); // once cup is made, it is not null, then the above statement runs!
-//				machine.vendCup(Cup.SMALL_CUP);
-//			break;
-//			case 1 :
-//				machine.getWaterHeater().setHeaterOn(); // quickly increases temp						
-//				break;
-//			case 2 :
-//				machine.getWaterHeater().setHeaterOff(); // slowly decreases temp
-//				break;
-//			case 3 :
-//				machine.getWaterHeater().setHotWaterTap(true);// quickly decreases temp
-//				break;
-//			case 4 :
-//				machine.getWaterHeater().setHotWaterTap(false); // slowly decreases temp
-//				break;
-//			case 5 :
-//				machine.getHoppers().setHopperOn(Hoppers.COFFEE);
-//				break;
-//			case 6 :
-//				machine.getHoppers().setHopperOn(Hoppers.MILK);
-//				break;			
-//			case 7 :
-//				machine.getWaterHeater().setColdWaterTap(true); // puts cold water on
-//				break;
-//			case 8 :
-//				machine.getWaterHeater().setColdWaterTap(false); // can stop pouring cold water
-//				break;
-//			case 9:
-//				// this will be used for rejecting transaction, returning all coins
-//				CoinValidation CV = new CoinValidation(coinCode, machine);
-//				CV.getChange();
-//				machine.getCoinHandler().getCoinTray(); 
-//				break;	
-//		}
-		
 	}
 	
-	
-	
+		
 	public void run() {
 		// Controlling thread for coffee machine
 		int counter=1;
