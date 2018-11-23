@@ -9,7 +9,7 @@ public class Drinks extends Drink {
 	private IMachine machine;
 	
 	private static boolean IDLE = true; // If temp has reached correct idle temp (75 - 76
-	private static boolean maxTempReached = false;
+	private static boolean maxTempReached, waterLimitReached = false;
 
 	public static String orderCodeString = ""; // Stores complete order code 
 	private static int orderCode, keyCode;
@@ -106,8 +106,8 @@ public class Drinks extends Drink {
 		keyCode = keyCodePassed;
 
 		checkAllIngredients(); // Check if enough there is enough ingredients for at least one drink in machine 
-
-		if (checkAllIngredients() && keyCode != -1) { // If they select reject, then display change
+		
+		if (keyCode != -1 && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3] && !waterLimitReached) { // If they select reject, then display change
 			if (keyCode == RETURN_CHANGE_BUTTON) {// If reject button, return balance
 				CoinValidation.getChange();
 				reset();// Reset everything
@@ -117,7 +117,7 @@ public class Drinks extends Drink {
 				System.out.println("Balance: " + CoinValidation.convertToMoneyDisplay() + " Temperture is to low to start making drink, please wait");
 				machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Temperture is to low to start making drink, please wait");
 			}
-			else // Go to orderCode method
+			else if (keyCode != -1 && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3] && !waterLimitReached)// Go to orderCode method
 				return true;
 		}
 		return false;
@@ -244,18 +244,16 @@ public class Drinks extends Drink {
 			 // If drink water level has reached water level then stop dispensing water, else dispense water
 			if (maxTempReached && cup.getWaterLevelLitres() >= cupSizeWaterLevel()) { 
 				machine.getWaterHeater().setHotWaterTap(false); 
+				waterLimitReached = true;
 				System.out.println("Water amount is correct: " + cup.getWaterLevelLitres());
 			}
 			else if (maxTempReached && cup.getWaterLevelLitres() < cupSizeWaterLevel()) 
 				machine.getWaterHeater().setHotWaterTap(true); 
 			
 			 // If drink is complete, temp has reached correct temp, and all other ingredients have stopped dispensing, then drink is done!
-			 if (IDLE && maxTempReached && cup.getWaterLevelLitres() >= cupSizeWaterLevel() && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3]) {
-					machine.getWaterHeater().setHotWaterTap(false); 
-				 if (machine.getWaterHeater().getTemperatureDegreesC() >= MIN && machine.getWaterHeater().getTemperatureDegreesC() <= EFFICIENT_TEMP - 0.5 ) 
-					 machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " " + allDrinks.get(match).name + " ready");
-					 reset();
-				
+			 if (IDLE && maxTempReached && waterLimitReached && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3]) {
+				 machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " " + allDrinks.get(match).name + " ready");
+				 reset();	
 			 }
 			
 			if (dispense[0] && maxTempReached && cup.getCoffeeGrams() >= amountLimit[0]) {
@@ -304,6 +302,7 @@ public class Drinks extends Drink {
 		cupSizeInt = 1;
 		maxTempReached = false;
 		Arrays.fill(dispense, false);
+		waterLimitReached = false;
 		machine.getCoinHandler().unlockCoinHandler(); // Can allow users to start entering coins again
 		amountLimit[0] = 2;
 		amountLimit[1] = 5;

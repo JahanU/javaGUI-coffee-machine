@@ -50,7 +50,7 @@ public class WaterHeaterController {
 
 	public boolean saveElectricity() { // maintain heat around 75 C
 		
-		if (machine.getWaterHeater().getTemperatureDegreesC() > EFFICIENT_TEMP && drink.getIdle())  // if above 76, turn heater off
+		if (machine.getWaterHeater().getTemperatureDegreesC() >= EFFICIENT_TEMP && drink.getIdle())  // if above 76, turn heater off
 			machine.getWaterHeater().setHeaterOff();
 		 if (machine.getWaterHeater().getTemperatureDegreesC() < EFFICIENT_TEMP && drink.getIdle()) // if below 76, turn heater on
 			machine.getWaterHeater().setHeaterOn(); // set the heater on, until it reaches 75 C

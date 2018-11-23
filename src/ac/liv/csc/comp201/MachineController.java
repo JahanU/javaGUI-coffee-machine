@@ -10,6 +10,12 @@ import ac.liv.csc.comp201.simulate.Hoppers;
 
 public class MachineController  extends Thread implements IMachineController {
 	
+	/***
+	 * @author Jahan
+	 * ID: 201272455
+	 */
+
+	
 	private boolean running = true;
 	private IMachine machine;
 	

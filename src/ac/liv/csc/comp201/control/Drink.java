@@ -7,10 +7,12 @@ import ac.liv.csc.comp201.model.IMachine;
 
 /***
  * @author Jahan
+ * ID: 201272455
  */
 
 public class Drink {
 	
+	//Stores all drinks
 	protected static ArrayList<Drink> allDrinks = new ArrayList<Drink>();
 
 	protected String name;
