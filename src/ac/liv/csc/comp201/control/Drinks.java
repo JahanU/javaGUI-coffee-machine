@@ -34,8 +34,11 @@ public class Drinks extends Drink {
 	private final String LARGE_CUP_PREFIX = "6";
 	private final int RETURN_CHANGE_BUTTON = 9; // Used to check if the user selected return change
 
+	CoinValidation coin;
+	
 	public Drinks(IMachine machine) {
 		this.machine = machine;
+		coin = new CoinValidation(machine);
 	}
 
 	private double cupSizeWaterLevel() { // gets the size of cup
@@ -109,13 +112,13 @@ public class Drinks extends Drink {
 		
 		if (keyCode != -1 && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3] && !waterLimitReached) { // If they select reject, then display change
 			if (keyCode == RETURN_CHANGE_BUTTON) {// If reject button, return balance
-				CoinValidation.getChange();
+				coin.getChange();
 				reset();// Reset everything
 			}
 			// If temp less than efficient temp and they entered ordercode we display error message
 			else if (checkAllIngredients() && machine.getWaterHeater().getTemperatureDegreesC() < EFFICIENT_TEMP - 1) {
-				System.out.println("Balance: " + CoinValidation.convertToMoneyDisplay() + " Temperture is to low to start making drink, please wait");
-				machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Temperture is to low to start making drink, please wait");
+				System.out.println("Balance: " + coin.convertToMoneyDisplay() + " Temperture is to low to start making drink, please wait");
+				machine.getDisplay().setTextString("Balance: " + coin.convertToMoneyDisplay() + " Temperture is to low to start making drink, please wait");
 			}
 			else if (keyCode != -1 && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3] && !waterLimitReached)// Go to orderCode method
 				return true;
@@ -128,12 +131,12 @@ public class Drinks extends Drink {
 	
 		machine.getCoinHandler().clearCoinTry();
 		Drinks.init(); // Initialise all drinks
-		machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay()  + " Order code: " + orderCodeString);
+		machine.getDisplay().setTextString("Balance: " + coin.convertToMoneyDisplay()  + " Order code: " + orderCodeString);
 
 		if (orderCodeString.length() < MAX_CODE_LEN)  { // Only store up maximum code length (4)
 			orderCodeString += Integer.toString(keyCode); // Converts integer code into string
 			System.out.println("Order code is: " + orderCodeString);
-			machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Order code: " + orderCodeString);
+			machine.getDisplay().setTextString("Balance: " + coin.convertToMoneyDisplay() + " Order code: " + orderCodeString);
 		}
 		
 		int codeLen = MIN_CODE_LEN; // Code length is set to auto set to min code length 
@@ -156,8 +159,8 @@ public class Drinks extends Drink {
 			}
 			for (int i = 0; i < allDrinks.size(); i++) { // Check order code
 				if (orderCode != allDrinks.get(i).code) { // If correct orderCode
-					System.out.println("Balance: " + CoinValidation.convertToMoneyDisplay() + " Incorrect order code, try again");
-					machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Incorrect order code, try again");	
+					System.out.println("Balance: " + coin.convertToMoneyDisplay() + " Incorrect order code, try again");
+					machine.getDisplay().setTextString("Balance: " + coin.convertToMoneyDisplay() + " Incorrect order code, try again");	
 					reset(); // Wrong code, start again
 					return false;	
 				}
@@ -170,8 +173,8 @@ public class Drinks extends Drink {
 	public boolean startDrink() { // Checks if we can make drink
 		// Checks price 
 		if  (machine.getBalance() < allDrinks.get(match).price) {
-			System.out.println("Not enough money, Entered: " + CoinValidation.convertToMoneyDisplay() + " Need: " + allDrinks.get(match).price + " for: " + allDrinks.get(match).name);
-			machine.getDisplay().setTextString("Not enough money, Entered: " + CoinValidation.convertToMoneyDisplay() + " Need: " + allDrinks.get(match).price + " for: " + allDrinks.get(match).name);
+			System.out.println("Not enough money, Entered: " + coin.convertToMoneyDisplay() + " Need: " + allDrinks.get(match).price + " for: " + allDrinks.get(match).name);
+			machine.getDisplay().setTextString("Not enough money, Entered: " + coin.convertToMoneyDisplay() + " Need: " + allDrinks.get(match).price + " for: " + allDrinks.get(match).name);
 			return false; // Cannot make drink as not enough money, start again
 		}
 		// All clear, can start making drink!
@@ -230,7 +233,7 @@ public class Drinks extends Drink {
 		final int MIN = 70; // If around 70 - 73, can stop displaying error message and show balance and orderCode
 		
 		if (machine.getWaterHeater().getTemperatureDegreesC() > MIN && machine.getWaterHeater().getTemperatureDegreesC() < (MIN + 3)) // Used to stop displaying error message when they press the keypad below IDLE temp
-			machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " Order code: " + orderCodeString);
+			machine.getDisplay().setTextString("Balance: " + coin.convertToMoneyDisplay() + " Order code: " + orderCodeString);
 		
 		Cup cup = machine.getCup();
 		if (cup != null) {  // If cup has been initialised 
@@ -252,7 +255,7 @@ public class Drinks extends Drink {
 			
 			 // If drink is complete, temp has reached correct temp, and all other ingredients have stopped dispensing, then drink is done!
 			 if (IDLE && maxTempReached && waterLimitReached && !dispense[0] && !dispense[1] && !dispense[2] && !dispense[3]) {
-				 machine.getDisplay().setTextString("Balance: " + CoinValidation.convertToMoneyDisplay() + " " + allDrinks.get(match).name + " ready");
+				 machine.getDisplay().setTextString("Balance: " + coin.convertToMoneyDisplay() + " " + allDrinks.get(match).name + " ready");
 				 reset();	
 			 }
 			

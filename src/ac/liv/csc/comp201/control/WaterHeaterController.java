@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 
 public class WaterHeaterController {
 	
-	private static IMachine machine;
+	private IMachine machine;
 	private float oldTemp;
 	private final int EFFICIENT_TEMP = 76;
 

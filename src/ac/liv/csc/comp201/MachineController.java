@@ -15,8 +15,8 @@ public class MachineController  extends Thread implements IMachineController {
 	 * ID: 201272455
 	 */
 
-	
 	private boolean running = true;
+	
 	private IMachine machine;
 	
 	WaterHeaterController WHC;
@@ -32,7 +32,7 @@ public class MachineController  extends Thread implements IMachineController {
 		machine.getKeyPad().setCaption(8,"");
 		machine.getKeyPad().setCaption(9,"Reject");	
 		
-		// Initialising all objects
+		// Initialising all objects (once!)
 		WHC = new WaterHeaterController(machine);
 		drinks = new Drinks(machine);
 		coins = new CoinValidation(machine);
@@ -66,7 +66,7 @@ public class MachineController  extends Thread implements IMachineController {
 		String coinCode = machine.getCoinHandler().getCoinKeyCode();
 		if (coinCode != null) {
 			coins.coin(coinCode); // Converts coinCode to money
-			machine.getDisplay().setTextString("Balance: " +  CoinValidation.convertToMoneyDisplay() + " Order code: " + Drinks.orderCodeString);
+			machine.getDisplay().setTextString("Balance: " +  coins.convertToMoneyDisplay() + " Order code: " + Drinks.orderCodeString);
 		}
 	}
 	
